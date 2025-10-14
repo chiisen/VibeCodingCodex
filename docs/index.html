@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenAI Codex 介紹</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-primary: #05060b;
+      --bg-secondary: #0a0d1a;
+      --text-primary: #f1f5ff;
+      --text-muted: #a5b3d6;
+      --accent: #52e3ff;
+      --accent-strong: #7cf7c4;
+      --accent-gradient: linear-gradient(135deg, rgba(82, 227, 255, 0.45), rgba(124, 247, 196, 0.35));
+      --border-glow: rgba(124, 247, 196, 0.25);
+      --card-bg: rgba(11, 17, 40, 0.65);
+      --max-width: 1100px;
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    ul {
+      margin: 1rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--text-muted);
+    }
+
+    li + li {
+      margin-top: 0.4rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      background: radial-gradient(circle at top right, rgba(82, 227, 255, 0.1), transparent 35%) no-repeat,
+                  radial-gradient(circle at bottom left, rgba(124, 247, 196, 0.12), transparent 40%) no-repeat,
+                  var(--bg-primary);
+      margin: 0;
+      color: var(--text-primary);
+      line-height: 1.6;
+    }
+
+    header {
+      padding: 6rem 1.5rem 4rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::before {
+      content: '';
+      position: absolute;
+      inset: -30% -10%;
+      background: radial-gradient(circle, rgba(124, 247, 196, 0.12) 0%, transparent 60%);
+      opacity: 0.6;
+      transform: rotate(12deg);
+    }
+
+    header h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 3.8rem);
+      margin: 0 0 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    header p {
+      max-width: 720px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+    }
+
+    .hero-cta {
+      margin-top: 2.5rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      padding: 0.9rem 1.8rem;
+      border-radius: 999px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: var(--bg-primary);
+      box-shadow: 0 12px 35px rgba(82, 227, 255, 0.25);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: rgba(82, 227, 255, 0.6);
+      color: var(--accent);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(124, 247, 196, 0.18);
+    }
+
+    main {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 1.5rem 5rem;
+    }
+
+    section {
+      margin: 4rem 0;
+      background: var(--card-bg);
+      border: 1px solid rgba(124, 247, 196, 0.08);
+      border-radius: 28px;
+      padding: 2.5rem;
+      backdrop-filter: blur(16px);
+      position: relative;
+    }
+
+    section::before {
+      content: '';
+      position: absolute;
+      inset: 2px;
+      border-radius: 26px;
+      border: 1px solid rgba(82, 227, 255, 0.08);
+      pointer-events: none;
+    }
+
+    h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      margin: 0 0 1.5rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .grid {
+      display: grid;
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .grid-2 {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    }
+
+    .card {
+      background: rgba(9, 14, 30, 0.65);
+      border: 1px solid rgba(82, 227, 255, 0.12);
+      border-radius: 22px;
+      padding: 1.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-glow);
+      box-shadow: 0 18px 40px rgba(82, 227, 255, 0.2);
+    }
+
+    .card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin: 0 0 0.75rem;
+      color: var(--accent);
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--text-muted);
+      font-size: 0.98rem;
+    }
+
+    .feature-list {
+      display: grid;
+      gap: 1rem;
+      margin: 2rem 0 0;
+    }
+
+    .feature {
+      display: flex;
+      gap: 1rem;
+      padding: 1.25rem;
+      border-radius: 18px;
+      background: rgba(5, 9, 22, 0.8);
+      border: 1px solid rgba(82, 227, 255, 0.1);
+    }
+
+    .feature span {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent-strong);
+      font-size: 1.6rem;
+      min-width: 2.5rem;
+      text-align: center;
+    }
+
+    .feature p {
+      color: var(--text-muted);
+      margin: 0.1rem 0 0;
+    }
+
+    .timeline {
+      border-left: 2px dashed rgba(82, 227, 255, 0.3);
+      padding-left: 1.5rem;
+      margin: 2rem 0 0;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 1.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -1.8rem;
+      top: 0.35rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(82, 227, 255, 0.75);
+    }
+
+    .timeline-item h4 {
+      margin: 0;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      font-size: 1rem;
+    }
+
+    .timeline-item p {
+      color: var(--text-muted);
+      margin: 0.4rem 0 0;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+      background: rgba(82, 227, 255, 0.1);
+      color: var(--accent);
+      padding: 0.2rem 0.4rem;
+      border-radius: 6px;
+    }
+
+    pre {
+      background: rgba(5, 9, 22, 0.85);
+      border: 1px solid rgba(82, 227, 255, 0.15);
+      border-radius: 16px;
+      padding: 1.2rem;
+      overflow-x: auto;
+      color: var(--accent-strong);
+      font-size: 0.95rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 3rem 1.5rem 4rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(82, 227, 255, 0.08);
+      background: linear-gradient(180deg, rgba(10, 14, 30, 0) 0%, rgba(10, 14, 30, 0.4) 40%, rgba(5, 6, 11, 0.95) 100%);
+    }
+
+    footer strong {
+      color: var(--accent);
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.08em;
+    }
+
+    @media (max-width: 720px) {
+      header {
+        padding-top: 4.5rem;
+        padding-bottom: 3rem;
+      }
+
+      section {
+        padding: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>OpenAI Codex</h1>
+    <p>Codex 是 OpenAI 打造的 AI 編碼代理，具備自然語言理解、程式碼生成與自動化開發流程協助能力，幫助團隊從構思到交付保持高速與高品質。</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="https://github.com/openai/codex" target="_blank" rel="noopener">前往 GitHub</a>
+      <a class="btn btn-outline" href="https://developers.openai.com/codex" target="_blank" rel="noopener">探索完整指南</a>
+    </div>
+  </header>
+
+  <main>
+    <section>
+      <h2>核心價值</h2>
+      <div class="grid grid-3">
+        <div class="card">
+          <h3>自然語言到程式碼</h3>
+          <p>透過 Codex，開發者可以使用自然語言描述需求並生成精準程式碼，支援 Python、JavaScript 等主流語言，大幅縮短構思到實作的距離。</p>
+        </div>
+        <div class="card">
+          <h3>全專案級智能</h3>
+          <p>新版 Codex 能檢視、編輯與重構整個專案，支援測試、自動修復與差異摘要，為團隊帶來端到端的 AI 開發夥伴。</p>
+        </div>
+        <div class="card">
+          <h3>多場景整合</h3>
+          <p>同時提供 CLI、IDE Plugin 與雲端 Codex Web，結合沙盒執行、MCP 擴充與自訂工作流程，適用個人開發到企業合作。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>快速開始</h2>
+      <div class="grid grid-2">
+        <div>
+          <pre><code>npm install -g @openai/codex
+codex
+</code></pre>
+          <p>或使用 Homebrew：<code>brew install codex</code>。啟動後選擇以 ChatGPT 帳戶登入，即可串連現有的 Plus、Pro、Team、Edu 或 Enterprise 訂閱方案。</p>
+          <div class="feature-list">
+            <div class="feature">
+              <span>01</span>
+              <div>
+                <strong>安裝 CLI</strong>
+                <p>全球套件管理支援 npm、Homebrew 與 GitHub Release 二進位檔，適配 macOS、Linux 及 Windows。</p>
+              </div>
+            </div>
+            <div class="feature">
+              <span>02</span>
+              <div>
+                <strong>登入 Codex</strong>
+                <p>選擇以 ChatGPT 方案登入或使用 OpenAI API 金鑰；支援無頭環境與零資料保留 (ZDR)。</p>
+              </div>
+            </div>
+            <div class="feature">
+              <span>03</span>
+              <div>
+                <strong>啟動專案助理</strong>
+                <p>Codex 透過 CLI 或 IDE 擴充載入專案，支援多代理記憶、測試腳本與自動 PR 摘要輸出。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>支援的工作流程</h3>
+          <p>Codex CLI 可在本機安全沙盒中執行，並可透過 Model Context Protocol (MCP) 連結外部服務：</p>
+          <ul>
+            <li>撰寫或重構程式碼、補齊測試與文件</li>
+            <li>執行 `codex exec` 進行非互動式自動化流程</li>
+            <li>整合 GitHub Action、TypeScript SDK，打造自動化管線</li>
+            <li>透過 `AGENTS.md` 建置持久記憶與專案守則</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>能力地圖</h2>
+      <div class="grid grid-3">
+        <div class="card">
+          <h3>智慧合作</h3>
+          <p>理解專案脈絡、維護者規範與測試策略，協助產出高品質的程式碼片段與評審建議。</p>
+        </div>
+        <div class="card">
+          <h3>自動化交付</h3>
+          <p>支援自動執行測試、生成變更摘要與 PR 描述，縮短從需求提交到發布的週期。</p>
+        </div>
+        <div class="card">
+          <h3>安全沙盒</h3>
+          <p>採用多層沙盒與權限審核，確保關鍵工作流程（如封存、部署）具備可控性與稽核紀錄。</p>
+        </div>
+      </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <h4>Codex CLI 面世</h4>
+          <p>提供跨平台的本機命令列體驗，支援 npm、Homebrew 與直接下載安裝。</p>
+        </div>
+        <div class="timeline-item">
+          <h4>IDE 整合</h4>
+          <p>推出 VS Code、Cursor、Windsurf 擴充，將 Codex 功能帶入開發者的日常工作流程。</p>
+        </div>
+        <div class="timeline-item">
+          <h4>Codex Web</h4>
+          <p>在 ChatGPT 進階方案中提供雲端版代理，支援跨專案協作與遠端執行環境。</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>資源導航</h2>
+      <div class="grid grid-2">
+        <div class="card">
+          <h3>官方文件</h3>
+          <ul>
+            <li><a href="https://github.com/openai/codex/blob/main/docs/getting-started.md" target="_blank" rel="noopener">Getting Started</a></li>
+            <li><a href="https://github.com/openai/codex/blob/main/docs/authentication.md" target="_blank" rel="noopener">Authentication</a></li>
+            <li><a href="https://github.com/openai/codex/blob/main/docs/config.md" target="_blank" rel="noopener">Configuration &amp; MCP</a></li>
+            <li><a href="https://github.com/openai/codex/blob/main/docs/sandbox.md" target="_blank" rel="noopener">Sandbox &amp; Approvals</a></li>
+            <li><a href="https://github.com/openai/codex/blob/main/docs/faq.md" target="_blank" rel="noopener">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>擴充與社群</h3>
+          <ul>
+            <li><a href="https://github.com/openai/codex-action" target="_blank" rel="noopener">GitHub Action 模板</a></li>
+            <li><a href="https://github.com/openai/codex/tree/main/sdk/typescript" target="_blank" rel="noopener">TypeScript SDK</a></li>
+            <li><a href="https://chatgpt.com/codex" target="_blank" rel="noopener">Codex Web 雲端代理</a></li>
+            <li><a href="https://developers.openai.com/codex/ide" target="_blank" rel="noopener">IDE 擴充安裝</a></li>
+            <li><a href="https://github.com/openai/codex/issues" target="_blank" rel="noopener">Issue 與社群討論</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p><strong>VibeCodingCodex</strong> 探索 AI 輔助開發的未來。立即啟動 Codex，讓創意與程式碼同步前進。</p>
+  </footer>
+</body>
+</html>
