@@ -1,0 +1,2 @@
+# VibeCodingCodex
+Vibe Coding Codex
